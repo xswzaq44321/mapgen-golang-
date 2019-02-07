@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"math"
+	V "mapgen-golang-/voronoi"
 	"math/rand"
 	"time"
 )
@@ -17,7 +17,7 @@ func main() {
 	json.Unmarshal(b, &setting)
 	rand.Seed(time.Now().UnixNano())
 
-	var voronoi Voronoi
+	var voronoi V.Voronoi
 	voronoi.Width = setting.Width
 	voronoi.Height = setting.Height
 
@@ -25,9 +25,9 @@ func main() {
 		x := rand.Intn(setting.Width-2*setting.MapPadding) + setting.MapPadding
 		y := rand.Intn(setting.Height-2*setting.MapPadding) + setting.MapPadding
 		if check(voronoi.Polygons, x, y) {
-			bar := Polygon{
-				Focus: Point{x, y},
-				Edges: make([]Edge, 0),
+			bar := V.Polygon{
+				Focus: V.Point{x, y},
+				Edges: make([]V.Edge, 0),
 			}
 			voronoi.Polygons = append(voronoi.Polygons, bar)
 		} else {
@@ -38,7 +38,7 @@ func main() {
 	output(voronoi)
 }
 
-func output(m Voronoi) {
+func output(m V.Voronoi) {
 	outJson, err := json.MarshalIndent(m, "", "\t")
 	if err != nil {
 		log.Fatalf("JSON marshaling failed: %s", err)
@@ -46,41 +46,13 @@ func output(m Voronoi) {
 	fmt.Printf("%s", outJson)
 }
 
-func check(polys []Polygon, x int, y int) bool {
+func check(polys []V.Polygon, x int, y int) bool {
 	for _, v := range polys {
-		if v.Focus.distance(Point{x, y}) < float64(setting.PointMargin) {
+		if v.Focus.Distance(V.Point{x, y}) < float64(setting.PointMargin) {
 			return false
 		}
 	}
 	return true
-}
-
-func (a Point) distance(b Point) float64 {
-	return math.Sqrt(math.Pow(float64(a.X-b.X), 2) + math.Pow(float64(a.Y-b.Y), 2))
-}
-
-type Point struct {
-	X int `json:"x"`
-	Y int `json:"y"`
-}
-
-type Edge struct {
-	A          Point `json:"a"`
-	B          Point `json:"b"`
-	ParentID   []int `json:"parentID,omitempty"`
-	isAbstract bool
-}
-
-type Polygon struct {
-	Edges []Edge `json:"edges,omitempty"`
-	Focus Point  `json:"focus"`
-	Id    int    `json:"id,omitempty"`
-}
-
-type Voronoi struct {
-	Width    int       `json:"width"`
-	Height   int       `json:"height"`
-	Polygons []Polygon `json:"polygons,omitempty"`
 }
 
 type Setting struct {
