@@ -3,5 +3,6 @@
 	"Height": 800,
 	"PointCount": 100,
 	"PointMargin": 20,
-	"MapPadding": 20
+	"MapPadding": 20,
+	"PointSize": 5
 }
