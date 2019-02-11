@@ -41,6 +41,7 @@ func main() {
 	}
 
 	imgOutput(voronoi)
+	output(voronoi)
 }
 
 func output(m V.Voronoi) {
