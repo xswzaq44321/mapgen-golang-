@@ -29,9 +29,9 @@ func main() {
 	for i := 0; i < setting.PointCount; i++ {
 		x := rand.Intn(setting.Width-2*setting.MapPadding) + setting.MapPadding
 		y := rand.Intn(setting.Height-2*setting.MapPadding) + setting.MapPadding
-		if check(voronoi.Polygons, x, y) {
+		if check(voronoi.Polygons, float64(x), float64(y)) {
 			bar := V.Polygon{
-				Focus: V.Point{X: x, Y: y},
+				Focus: V.Point{X: float64(x), Y: float64(y)},
 				Edges: make([]V.Edge, 0),
 			}
 			voronoi.Polygons = append(voronoi.Polygons, bar)
@@ -77,7 +77,7 @@ func imgOutput(m V.Voronoi) {
 	png.Encode(outputFile, myImage)
 }
 
-func fillCircle(img *image.RGBA, x0, y0, R int, c color.RGBA) {
+func fillCircle(img *image.RGBA, x0, y0 float64, R int, c color.RGBA) {
 	r := float64(R) / 2
 	err := 0.0
 	if R%2 == 0 {
@@ -86,8 +86,8 @@ func fillCircle(img *image.RGBA, x0, y0, R int, c color.RGBA) {
 	for x := math.Floor(r) - err; x >= -math.Floor(r); x-- {
 		// round half down y = ceil(x-0.5)
 		for y := math.Ceil(math.Sqrt(r*r-x*x)-0.5) - err; y >= -math.Ceil(math.Sqrt(r*r-x*x)-0.5); y-- {
-			dx := x0 + int(x+err)
-			dy := y0 + int(y+err)
+			dx := int(x0 + x + err)
+			dy := int(y0 + y + err)
 			if dx < 0 || dx >= img.Rect.Dx() || dy < 0 || dy >= img.Rect.Dy() {
 				continue
 			} else {
@@ -97,7 +97,7 @@ func fillCircle(img *image.RGBA, x0, y0, R int, c color.RGBA) {
 	}
 }
 
-func check(polys []V.Polygon, x int, y int) bool {
+func check(polys []V.Polygon, x, y float64) bool {
 	for _, v := range polys {
 		if v.Focus.Distance(V.Point{X: x, Y: y}) < float64(setting.PointMargin) {
 			return false
