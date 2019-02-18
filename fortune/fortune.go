@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
+	"mapgen-golang-/BST"
 	V "mapgen-golang-/voronoi"
 	"os"
 )
@@ -11,34 +11,21 @@ import (
 var setting Setting
 var vmap V.Voronoi
 
-func main() {
-	poly := V.Polygon{
-		Edges: []V.Edge{
-			V.Edge{
-				A: V.Point{658, 621},
-				B: V.Point{514, 544},
-			},
-			V.Edge{
-				A: V.Point{261, 109},
-				B: V.Point{232, 0},
-			},
-			V.Edge{
-				A: V.Point{232, 0},
-				B: V.Point{558, 0},
-			},
-			V.Edge{
-				A: V.Point{261, 109},
-				B: V.Point{514, 544},
-			},
-			V.Edge{
-				A: V.Point{558, 0},
-				B: V.Point{658, 621},
-			},
-		},
-		Focus: V.Point{519, 272},
-	}
+type Bar struct {
+	data int
+}
 
-	fmt.Println(poly.Contain(V.Point{245, 93}))
+func (a Bar) LessThan(c BST.Comparable) bool {
+	return a.data < c.(Bar).data
+}
+func (a Bar) GreaterThan(c BST.Comparable) bool {
+	return a.data > c.(Bar).data
+}
+func (a Bar) EqualTo(c BST.Comparable) bool {
+	return a.data == c.(Bar).data
+}
+
+func main() {
 }
 
 func initial() {
@@ -55,11 +42,25 @@ type Setting struct {
 
 type SweepLine struct {
 	L            float64
-	beachPolys   []V.Polygon
-	siteEvents   []Event
-	circleEvents []Event
-	vmap         V.Voronoi
+	beachPolys   []*V.Polygon
+	siteEvents   []*Event
+	circleEvents []*Event
+	vmap         *V.Voronoi
 }
 
+type ByX []Event
+
+func (a ByX) Len() int           { return len(a) }
+func (a ByX) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByX) Less(i, j int) bool { return a[i].X < a[j].X }
+
 type Event struct {
+	relevant []*V.Polygon
+	X        float64
+	center   V.Point
+	isCircle bool
+}
+
+func det(m [3][3]float64) float64 {
+	return (m[0][0]*m[1][1]*m[2][2] + m[0][1]*m[1][2]*m[2][0] + m[0][2]*m[1][0]*m[2][1]) - (m[0][2]*m[1][1]*m[2][0] + m[0][1]*m[1][0]*m[2][2] + m[0][0]*m[1][2]*m[2][1])
 }

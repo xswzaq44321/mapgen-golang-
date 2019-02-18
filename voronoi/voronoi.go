@@ -14,6 +14,24 @@ func (a Point) Distance(b Point) float64 {
 	return math.Sqrt(math.Pow(a.X-b.X, 2) + math.Pow(a.Y-b.Y, 2))
 }
 
+func vector(a Point, b Point) Point {
+	return Point{b.X - a.X, b.Y - a.Y}
+}
+
+func cross(o Point, a Point, b Point) float64 {
+	v1, v2 := vector(o, a), vector(o, b)
+	return v1.X*v2.Y - v1.Y*v2.X
+}
+
+func midPoint(points []Point) Point {
+	var Sx, Sy float64
+	for _, v := range points {
+		Sx += v.X
+		Sy += v.Y
+	}
+	return Point{Sx / float64(len(points)), Sy / float64(len(points))}
+}
+
 type Edge struct {
 	A        Point `json:"a"`
 	B        Point `json:"b"`
@@ -37,33 +55,11 @@ func (e Edge) Distance(p Point) float64 {
 	return math.Abs(a*p.X+b*p.Y+c) / math.Sqrt(a*a+b*b)
 }
 
-func (e Edge) GetParent() []int {
-	return e.ParentID
-}
-
 type Polygon struct {
 	Edges     []Edge `json:"edges,omitempty"`
 	Focus     Point  `json:"focus"`
 	Id        int    `json:"id,omitempty"`
 	organized bool
-}
-
-func vector(a Point, b Point) Point {
-	return Point{b.X - a.X, b.Y - a.Y}
-}
-
-func cross(o Point, a Point, b Point) float64 {
-	v1, v2 := vector(o, a), vector(o, b)
-	return v1.X*v2.Y - v1.Y*v2.X
-}
-
-func midPoint(points []Point) Point {
-	var Sx, Sy float64
-	for _, v := range points {
-		Sx += v.X
-		Sy += v.Y
-	}
-	return Point{Sx / float64(len(points)), Sy / float64(len(points))}
 }
 
 type foo struct {
